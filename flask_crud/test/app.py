@@ -11,7 +11,11 @@ api = Api()
 
 def create_app() -> Flask:
     app = Flask("CRUDTest")
-    app.config.update(OPENAPI_VERSION="3.0.2", SQLALCHEMY_DATABASE_URI=f"sqlite://")
+    app.config.update(
+        OPENAPI_VERSION="3.0.2",
+        SQLALCHEMY_DATABASE_URI=f"sqlite://",
+        SQLALCHEMY_TRACK_MODIFICATIONS=False,
+    )
     db.init_app(app)
     api.init_app(app)
     CRUD(app)
@@ -45,7 +49,7 @@ blp = Blueprint("pets", "pets", url_prefix="/pets", description="Operations on p
 class PetCollection(CollectionView):
     model = Pet
     schema = PetSchemaLite
-    prefetch = ['owners']  # joinedload
+    prefetch = ["owners"]  # joinedload
 
     can_create = True
     can_list = True
