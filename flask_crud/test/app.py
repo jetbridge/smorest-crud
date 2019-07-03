@@ -54,6 +54,7 @@ class PetCollection(CollectionView):
     def get(self):
         return super().get()
 
+    @blp.arguments(PetSchema)
     @blp.response(PetSchema)
     def post(self, args):
         return super().post(args)
@@ -71,6 +72,7 @@ class PetResource(ResourceView):
     def get(self, pk):
         return super().get(pk)
 
+    @blp.arguments(PetSchema)
     @blp.response(PetSchema)
     def patch(self, pk, args):
         return super().patch(pk, args)
