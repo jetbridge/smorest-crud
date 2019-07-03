@@ -4,6 +4,10 @@ _Why repeat yourself?_
 # What is this?
 Right now, a work in progress.
 
+
+Discussion [over here](https://github.com/Nobatek/flask-rest-api/issues/79)
+
+
 This library aims to tie together Flask-SQLAlchemy and Flask-REST-API to implement a sane default but easily customizable REST CRUD API based on SQLAlchemy models inside of Flask.
 
 # Where to look?
