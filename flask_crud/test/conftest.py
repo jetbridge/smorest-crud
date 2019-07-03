@@ -32,6 +32,7 @@ def pets(pet_factory, db):
     pets = [pet_factory.create() for n in range(10)]
     db.session.add_all(pets)
     db.session.commit()
+    yield pets
 
 
 @register
