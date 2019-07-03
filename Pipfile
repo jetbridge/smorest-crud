@@ -1,0 +1,38 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+Flask = "*"
+werkzeug = "*"
+requests = "*"
+flask_sqlalchemy = "*"
+flask-rest-api = "*"
+marshmallow = "*"
+
+[dev-packages]
+flake8 = "*"
+pytest = "*"
+mypy = "*"
+flake8-mypy = {ref = "27f1888d7e6766d1b4357cb7a2ecede4bc95b281",git = "https://github.com/jetbridge/flake8-mypy.git"}
+importmagic = "*"
+epc = "*"
+pytest-xdist = "*"
+watchdog = "*"
+ipdb = "*"
+mypy_extensions = ">=0.4.1"
+black = "*"
+pre-commit = "*"
+pyls-isort = "*"
+pyls-mypy = "*"
+pyls-black = "*"
+rope = "*"
+flask-shell-ipython = "*"
+pytest-factoryboy = "*"
+
+[requires]
+python_version = "3.7"
+
+[pipenv]
+allow_prereleases = true
