@@ -6,7 +6,7 @@ from flask_sqlalchemy import SQLAlchemy
 log = logging.getLogger(__name__)
 
 # access initialized extension
-_crud = LocalProxy(lambda: current_app.extensions["flask_rest_crud"])
+_crud = LocalProxy(lambda: current_app.extensions["crud"])
 
 
 class CRUD(object):

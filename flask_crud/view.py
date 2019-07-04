@@ -54,9 +54,12 @@ class CollectionView(CRUDView):
             abort(405)
 
         # TODO: access check
+
+        # create
         item = self.model(**args)
         self._db.session.add(item)
-        self._db.commit()
+
+        self._db.session.commit()
         return item
 
 
@@ -82,7 +85,7 @@ class ResourceView(CRUDView):
         # TODO: access check
 
         update_attrs(item, **args)
-        self._db.commit()
+        self._db.session.commit()
         return item
 
     def delete(self, pk) -> BaseQuery:
@@ -93,7 +96,7 @@ class ResourceView(CRUDView):
         # TODO: access check
 
         self._db.delete(item)
-        self._db.commit()
+        self._db.session.commit()
 
 
 def update_attrs(item, **kwargs):
