@@ -77,7 +77,7 @@ class ResourceView(CRUDView):
 
         return item
 
-    def patch(self, pk, args) -> BaseQuery:
+    def patch(self, args, pk) -> BaseQuery:
         if not self.can_update:
             abort(405)
 
@@ -95,7 +95,7 @@ class ResourceView(CRUDView):
         item = self._lookup(pk)
         # TODO: access check
 
-        self._db.delete(item)
+        self._db.session.delete(item)
         self._db.session.commit()
 
 

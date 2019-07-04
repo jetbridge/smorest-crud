@@ -33,16 +33,16 @@ class Pet(db.Model):  # noqa: T484
 
 
 class PetSchemaLite(Schema):
-    id = f.Integer(dump_only=True)
+    id = f.Integer(dump_only=True)  # not editable
     genus = f.String()
     species = f.String()
 
 
-class PetSchema(Schema):
+class PetSchema(PetSchemaLite):
     edible = f.Boolean()
 
 
-blp = Blueprint("pets", "pets", url_prefix="/pets", description="Operations on pets")
+blp = Blueprint("pets", "pets", url_prefix="/pet", description="Operations on pets")
 
 
 @blp.route("")
@@ -78,9 +78,9 @@ class PetResource(ResourceView):
 
     @blp.arguments(PetSchema)
     @blp.response(PetSchema)
-    def patch(self, pk, args):
-        return super().patch(pk, args)
+    def patch(self, args, pk):
+        return super().patch(args, pk)
 
     @blp.response(PetSchema)
-    def delete(self, pk, args):
+    def delete(self, pk):
         return super().delete(pk)
