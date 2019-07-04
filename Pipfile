@@ -6,10 +6,8 @@ name = "pypi"
 [packages]
 Flask = "*"
 werkzeug = "*"
-requests = "*"
 flask_sqlalchemy = "*"
-flask-rest-api = "*"
-marshmallow = "*"
+"flask-rest-api" = "*"
 
 [dev-packages]
 flake8 = "*"
