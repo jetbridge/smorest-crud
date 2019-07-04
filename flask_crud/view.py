@@ -1,8 +1,10 @@
+from typing import Iterable
 from flask.views import MethodView
-from flask_sqlalchemy import Model, BaseQuery, SQLAlchemy
-from marshmallow import Schema
 from flask_rest_api import abort
-from flask_crud import _crud  # access db through _crud.db
+from flask_sqlalchemy import BaseQuery, Model, SQLAlchemy
+from sqlalchemy.orm import RelationshipProperty, joinedload
+from functools import reduce
+from flask_crud import _crud
 
 
 class CRUDView(MethodView):
@@ -10,20 +12,14 @@ class CRUDView(MethodView):
 
     # define these, please
     model: Model
-    schema: Schema
 
     def query(self) -> BaseQuery:
         return self._get_model().query
 
-    def _get_model(self):
-        """Return model this API is using.
-
-        Defaults to using the schema_class model if model isn't set.
-        """
+    def _get_model(self) -> Model:
+        """Return model class this API is using."""
         if self.model:
             return self.model
-        if self.schema and hasattr(self.schema.Meta, "model"):
-            return self.schema.Meta.model
         # otherwise... sorry
         raise Exception(f"no model class exists on {self}")
 
@@ -34,23 +30,30 @@ class CRUDView(MethodView):
 
 
 class CollectionView(CRUDView):
-    can_create = False
-    can_list = False
+    """API view that can manage listing items in a collection or creating a new item.
+
+    """
+
+    create_enabled: bool = False
+    list_enabled: bool = False
+
+    prefetch: Iterable[RelationshipProperty] = []
 
     def get(self) -> BaseQuery:
-        """List collection.
-
-        Should support prefetching."""
-        if not self.can_list:
+        """List collection."""
+        if not self.list_enabled:
             abort(405)
 
+        query = self.query()
         # TODO: access check (in the form of a query filter)
 
-        return self.query().all()
+        query = self._add_prefetch(query)
 
-    def post(self, args):
+        return query
+
+    def post(self, args=None):
         """Create new model."""
-        if not self.can_create:
+        if not self.create_enabled:
             abort(405)
 
         # TODO: access check
@@ -62,24 +65,51 @@ class CollectionView(CRUDView):
         self._db.session.commit()
         return item
 
+    def _add_prefetch(self, query: BaseQuery) -> BaseQuery:
+        if self.prefetch:
+            # apply joinedloaded rels
+            for rels in self.prefetch:
+                if is_listy(rels):
+                    # list/tuple, construct chain of joinedloads
+                    if len(rels) > 1:
+                        opts = reduce(
+                            lambda o, r: o.joinedload(r), rels[1:], joinedload(rels[0])
+                        )
+                    else:
+                        opts = joinedload(rels[0])
+                else:
+                    # just a single relationship (not chained)
+                    opts = joinedload(rels)
+
+                query = query.options(opts)
+        return query
+
 
 class ResourceView(CRUDView):
-    can_update = False
-    can_delete = False
+    get_enabled: bool = True  # enabled by default
+    update_enabled: bool = False
+    delete_enabled: bool = False
 
     def _lookup(self, pk):
+        """Get model by primary key."""
         item = self.model.query.get_or_404(pk)
         return item
 
     def get(self, pk) -> BaseQuery:
+        if not self.get_enabled:
+            abort(405)
+
         item = self._lookup(pk)
         # TODO: access check
 
         return item
 
-    def patch(self, args, pk) -> BaseQuery:
-        if not self.can_update:
+    def patch(self, args=None, pk=None) -> BaseQuery:
+        if not self.update_enabled:
             abort(405)
+
+        if not pk:
+            raise Exception("pk not passed to patch()")
 
         item = self._lookup(pk)
         # TODO: access check
@@ -89,7 +119,7 @@ class ResourceView(CRUDView):
         return item
 
     def delete(self, pk) -> BaseQuery:
-        if not self.can_delete:
+        if not self.delete_enabled:
             abort(405)
 
         item = self._lookup(pk)
@@ -104,3 +134,8 @@ def update_attrs(item, **kwargs):
     for attr, value in kwargs.items():
         if hasattr(item, attr):
             setattr(item, attr, value)
+
+
+def is_listy(thing) -> bool:
+    t = type(thing)
+    return t is list or t is tuple or t is set
