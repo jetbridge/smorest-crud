@@ -20,8 +20,14 @@ class CRUD(object):
     def init_app(self, app, identity_handler=None):
         if "sqlalchemy" not in app.extensions:
             raise Exception(
-                "please initialize CRUD after initializing the Flask-SQLAlchemy extension"
+                "Please initialize CRUD after initializing the "
+                "Flask-SQLAlchemy extension on your app."
             )
+
+        if 'CRUD_GET_USER' in app.config:
+            self.get_user = app.config['CRUD_GET_USER']
+        else:
+            raise Exception("CRUD_GET_USER not found in configuration")
 
         # save sqla db object for later
         self.db = app.extensions["sqlalchemy"].db
@@ -32,4 +38,4 @@ class CRUD(object):
 
 from flask_crud.view import ResourceView, CollectionView
 
-__all__ = ("ResourceView", "CollectionView")
+__all__ = ("ResourceView", "CollectionView", "CRUD", "ModelPermission")

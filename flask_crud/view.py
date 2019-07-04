@@ -56,10 +56,15 @@ class CollectionView(CRUDView):
         if not self.create_enabled:
             abort(405)
 
-        # TODO: access check
-
         # create
         item = self.model(**args)
+
+        # TODO: access check
+        if not isinstance(item, ACL):
+            raise ProgrammingError()
+            if not item.user_can_write():
+                abort(403)
+
         self._db.session.add(item)
 
         self._db.session.commit()

@@ -4,6 +4,7 @@ from flask_crud import ResourceView, CRUD, CollectionView
 from flask_rest_api import Api, Blueprint
 from marshmallow import fields as f, Schema
 from sqlalchemy import inspect
+from unittest.mock import MagicMock
 import os
 
 db = SQLAlchemy()
@@ -22,6 +23,7 @@ def create_app() -> Flask:
         SQLALCHEMY_DATABASE_URI=f"sqlite://",
         SQLALCHEMY_TRACK_MODIFICATIONS=False,
         SQLALCHEMY_ECHO=debug,
+        CRUD_GET_USER=lambda: MagicMock()
     )
     db.init_app(app)
     api.init_app(app)
