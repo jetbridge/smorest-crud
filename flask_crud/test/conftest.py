@@ -1,4 +1,5 @@
-from .app import create_app, db as db_, Pet
+from flask_crud.test.app import create_app, db as db_
+from flask_crud.test.app.model import Pet, Human
 import pytest
 from pytest_factoryboy import register
 import factory
@@ -36,6 +37,14 @@ def pets(pet_factory, db):
 
 
 @register
+class HumanFactory(factory.Factory):
+    class Meta:
+        model = Human
+
+    name = factory.LazyAttribute(lambda x: faker.name())
+
+
+@register
 class PetFactory(factory.Factory):
     class Meta:
         model = Pet
@@ -43,3 +52,5 @@ class PetFactory(factory.Factory):
     genus = factory.LazyAttribute(lambda x: faker.name())
     species = factory.LazyAttribute(lambda x: faker.name())
     edible = factory.LazyAttribute(lambda x: random.choice((True, False)))
+
+    human = factory.SubFactory(HumanFactory)
