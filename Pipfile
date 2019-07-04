@@ -30,6 +30,7 @@ pyls-black = "*"
 rope = "*"
 flask-shell-ipython = "*"
 pytest-factoryboy = "*"
+twine = "*"
 
 [requires]
 python_version = "3.7"
