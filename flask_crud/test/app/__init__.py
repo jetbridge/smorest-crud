@@ -1,19 +1,20 @@
-from flask import Flask
+from flask import Flask, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_crud import ResourceView, CRUD, CollectionView
-from flask_rest_api import Api, Blueprint
+from flask_rest_api import Api, Blueprint, abort
 from marshmallow import fields as f, Schema
 from sqlalchemy import inspect
-from unittest.mock import MagicMock
 import os
 
 db = SQLAlchemy()
 
-from flask_crud.test.app.model import Pet, Human
+from flask_crud.test.app.model import Pet, Human, Car
 
 api = Api()
 
 debug = bool(os.getenv("DEBUG"))
+
+USER_NAME = "mischa"
 
 
 def create_app() -> Flask:
@@ -23,7 +24,8 @@ def create_app() -> Flask:
         SQLALCHEMY_DATABASE_URI=f"sqlite://",
         SQLALCHEMY_TRACK_MODIFICATIONS=False,
         SQLALCHEMY_ECHO=debug,
-        CRUD_GET_USER=lambda: MagicMock()
+        CRUD_GET_USER=lambda: Human(name=USER_NAME),
+        CRUD_ACCESS_CHECKS_ENABLED=True,
     )
     db.init_app(app)
     api.init_app(app)
@@ -39,7 +41,8 @@ def create_app() -> Flask:
 class HumanSchema(Schema):
     id = f.Integer(dump_only=True)  # not editable
     name = f.String()
-    pets = f.Nested("PetSchemaLite", exclude=("human",))
+    pets = f.Nested("PetSchemaLite", many=True, exclude=("human",))
+    not_allowed = f.String(load_only=True)  # disallowed for create
 
 
 class PetSchemaLite(Schema):
@@ -60,20 +63,25 @@ pet_blp = Blueprint("pets", "pets", url_prefix="/pet")
 class PetCollection(CollectionView):
     model = Pet
     prefetch = [Pet.human, (Pet.human, Human.cars)]  # joinedload
+    access_checks_enabled = False
 
     create_enabled = True
     list_enabled = True
 
-    @pet_blp.response(PetSchemaLite(many=True))
     def get(self):
         query = super().get()
 
         # check prefetch worked
         first = query.first()
-        assert is_rel_loaded(first, "human"), "failed to prefetch rel 'human'"
-        assert is_rel_loaded(first.human, "cars"), "failed to prefetch secondary relationship 'human' -> 'car'"
 
-        return query
+        return jsonify(
+            {
+                "loaded": {
+                    "first.human": is_rel_loaded(first, "human"),
+                    "first.human.cars": is_rel_loaded(first.human, "cars"),
+                }
+            }
+        )
 
     @pet_blp.arguments(PetSchema)
     @pet_blp.response(PetSchema)
@@ -85,7 +93,8 @@ class PetCollection(CollectionView):
 class PetResource(ResourceView):
     model = Pet
 
-    get_enabled = True  # enabled by default
+    access_checks_enabled = False
+    get_enabled = True
     update_enabled = True
     delete_enabled = True
 
@@ -110,14 +119,37 @@ human_blp = Blueprint("humans", "humans", url_prefix="/human")
 class HumanCollection(CollectionView):
     model = Human
 
+    list_enabled = True
+    create_enabled = True
+
+    @human_blp.response(HumanSchema(many=True))
+    def get(self):
+        return super().get()
+
+    @human_blp.arguments(HumanSchema)
+    @human_blp.response(HumanSchema)
+    def post(self, args):
+        if "not_allowed" in args:
+            abort(403)
+
+        return super().post(args)
+
 
 @human_blp.route("/<int:pk>")
 class HumanResource(ResourceView):
     model = Human
 
+    update_enabled = True
+    get_enabled = True
+
     @human_blp.response(HumanSchema)
     def get(self, pk):
         return super().get(pk)
+
+    @human_blp.arguments(HumanSchema)
+    @human_blp.response(HumanSchema)
+    def patch(self, args, pk):
+        return super().patch(args, pk)
 
 
 pointless_blp = Blueprint(
@@ -125,10 +157,14 @@ pointless_blp = Blueprint(
 )
 
 
+@pointless_blp.route("")
+class PointlessCollection(CollectionView):
+    model = Car
+
+
 @pointless_blp.route("/<int:pk>")
 class PointlessResource(ResourceView):
-    model = Human
-    get_enabled = False
+    model = Car
 
 
 def is_rel_loaded(item, attr_name):
