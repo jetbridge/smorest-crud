@@ -26,5 +26,6 @@ setup(
     zip_safe=False,
     include_package_data=True,
     platforms="any",
-    install_requires=["Flask", "crud", "rest", "api", "sqlalchemy"],
+    install_requires=["Flask", "flask_sqlalchemy", "flask-rest-api"],
+
 )
