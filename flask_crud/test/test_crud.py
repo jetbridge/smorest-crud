@@ -17,7 +17,7 @@ def test_get(client: FlaskClient, pets, db):
     human = pets[0].human
     human.name = USER_NAME  # for access check
     db.session.commit()
-    
+
     res = client.get(f"/human/{human.id}")
     assert res.status_code == 200
     human = res.json
