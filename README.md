@@ -1,4 +1,4 @@
-# Flask CRUD
+# Flask Smorest CRUD
 _Why repeat yourself?_
 
 # What is this?
