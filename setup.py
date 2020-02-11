@@ -5,9 +5,9 @@ with open("README.md") as f:
 
 NAME = "smorest-crud"
 DESCRIPTION = (
-    "Reusable CRUD endpoints using flask-smorest, flask_jwt_extended, and SQLAlchemy."
+    "Reusable CRUD endpoints using flask-smorest, flask-jwt-extended, and SQLAlchemy."
 )
-VERSION = "0.0.3"
+VERSION = "0.0.4"
 REQUIRES_PYTHON = ">=3.6.0"
 
 setup(
