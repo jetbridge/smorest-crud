@@ -15,7 +15,7 @@ setup(
     version=VERSION,
     python_requires=REQUIRES_PYTHON,
     url="https://github.com/jetbridge/smorest-crud",
-    license="WTFPL",
+    license="MIT",
     author="JetBridge",
     author_email="me@mish.dev",
     description=DESCRIPTION,

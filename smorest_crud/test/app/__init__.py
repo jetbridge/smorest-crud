@@ -12,7 +12,6 @@ db = SQLAlchemy()
 from smorest_crud.test.app.model import Pet, Human, Car
 
 api = Api()
-
 debug = bool(os.getenv("DEBUG"))
 
 USER_NAME = "mischa"
