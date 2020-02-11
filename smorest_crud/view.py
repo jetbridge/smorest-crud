@@ -4,7 +4,8 @@ from flask_rest_api import abort
 from flask_sqlalchemy import BaseQuery, Model, SQLAlchemy
 from sqlalchemy.orm import RelationshipProperty, joinedload
 from functools import reduce
-from flask_crud import _crud, AccessControlUser
+from flask_jwt_extended import jwt_required
+from smorest_crud import _crud, AccessControlUser
 import logging
 
 log = logging.getLogger(__name__)
@@ -19,13 +20,18 @@ class CRUDView(MethodView):
     model: Model
     access_checks_enabled: bool = True
 
+    # default
+    decorators = [jwt_required]
+
     def query(self) -> BaseQuery:
         return self._get_model().query
 
     def query_for_user(self) -> BaseQuery:
         model_cls = self._get_model()
-        if not hasattr(model_cls, 'query_for_user'):
-            raise NotImplementedError(f"{model_cls} does not implement query_for_user() and access control checks are enabled")
+        if not hasattr(model_cls, "query_for_user"):
+            raise NotImplementedError(
+                f"{model_cls} does not implement query_for_user() and access control checks are enabled"
+            )
 
         user = self._get_current_user()
         # XXX: do we require user?

@@ -1,5 +1,5 @@
 from flask.testing import FlaskClient
-from flask_crud.test.app import USER_NAME
+from smorest_crud.test.app import USER_NAME
 
 
 def test_list(client: FlaskClient, pets):

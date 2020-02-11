@@ -1,5 +1,5 @@
-from flask_crud.test.app import create_app, db as db_
-from flask_crud.test.app.model import Pet, Human
+from smorest_crud.test.app import create_app, db as db_
+from smorest_crud.test.app.model import Pet, Human
 import pytest
 from pytest_factoryboy import register
 import factory

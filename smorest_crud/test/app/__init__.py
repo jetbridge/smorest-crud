@@ -1,6 +1,6 @@
 from flask import Flask, jsonify
 from flask_sqlalchemy import SQLAlchemy
-from flask_crud import ResourceView, CRUD, CollectionView
+from smorest_crud import ResourceView, CRUD, CollectionView
 from flask_rest_api import Api, Blueprint, abort
 from marshmallow import fields as f, Schema
 from sqlalchemy import inspect
@@ -8,7 +8,7 @@ import os
 
 db = SQLAlchemy()
 
-from flask_crud.test.app.model import Pet, Human, Car
+from smorest_crud.test.app.model import Pet, Human, Car
 
 api = Api()
 

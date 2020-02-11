@@ -24,11 +24,15 @@ class AccessControlUser:
         return self.user_can_write(user)
 
     def user_can_write(self, user: "AccessControlUser") -> bool:
-        raise NotImplementedError(f"user_can_write(self, user) not implemented on {self}")
+        raise NotImplementedError(
+            f"user_can_write(self, user) not implemented on {self}"
+        )
 
     def user_can_create(self, user: "AccessControlUser", args: Optional[dict]) -> bool:
         # TODO: not needed right now - maybe can implement if needed
-        raise NotImplementedError(f"user_can_create(self, user, args) not implemented on {self}")
+        raise NotImplementedError(
+            f"user_can_create(self, user, args) not implemented on {self}"
+        )
 
 
 class CRUD(object):
@@ -65,6 +69,6 @@ class CRUD(object):
         app.extensions["crud"] = self
 
 
-from flask_crud.view import ResourceView, CollectionView
+from smorest_crud.view import ResourceView, CollectionView
 
 __all__ = ("ResourceView", "CollectionView", "CRUD", "AccessControlUser")

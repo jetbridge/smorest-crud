@@ -1,7 +1,7 @@
-from flask_crud.test.app import db
+from smorest_crud.test.app import db
 from sqlalchemy import Column, Integer, Text, ForeignKey
 from sqlalchemy.orm import relationship
-from flask_crud import AccessControlUser
+from smorest_crud import AccessControlUser
 from flask_sqlalchemy import BaseQuery
 
 
