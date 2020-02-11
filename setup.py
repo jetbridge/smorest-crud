@@ -4,7 +4,9 @@ with open("README.md") as f:
     long_description = f.read()
 
 NAME = "smorest-crud"
-DESCRIPTION = "Reusable CRUD endpoints using flask-smorest and SQLAlchemy."
+DESCRIPTION = (
+    "Reusable CRUD endpoints using flask-smorest, flask_jwt_extended, and SQLAlchemy."
+)
 VERSION = "0.0.2"
 REQUIRES_PYTHON = ">=3.6.0"
 
@@ -26,5 +28,10 @@ setup(
     zip_safe=False,
     include_package_data=True,
     platforms="any",
-    install_requires=["Flask", "flask_sqlalchemy", "flask-smorest"],
+    install_requires=[
+        "Flask",
+        "flask_sqlalchemy",
+        "flask-smorest",
+        "flask_jwt_extended",
+    ],
 )

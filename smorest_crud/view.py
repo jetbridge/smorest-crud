@@ -1,6 +1,6 @@
 from typing import Iterable, Optional
 from flask.views import MethodView
-from flask_rest_api import abort
+from flask_smorest import abort
 from flask_sqlalchemy import BaseQuery, Model, SQLAlchemy
 from sqlalchemy.orm import RelationshipProperty, joinedload
 from functools import reduce

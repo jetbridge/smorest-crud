@@ -8,6 +8,7 @@ Flask = "*"
 werkzeug = "*"
 flask_sqlalchemy = "*"
 "flask-smorest" = "*"
+flask-jwt-extended = "*"
 
 [dev-packages]
 flake8 = "*"
@@ -27,6 +28,7 @@ pyls-black = "*"
 flask-shell-ipython = "*"
 pytest-factoryboy = "*"
 twine = "*"
+bento-cli = "*"
 
 [requires]
 python_version = "3.7"

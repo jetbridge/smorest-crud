@@ -1,10 +1,11 @@
 from flask import Flask, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from smorest_crud import ResourceView, CRUD, CollectionView
-from flask_rest_api import Api, Blueprint, abort
+from flask_smorest import Api, Blueprint, abort
 from marshmallow import fields as f, Schema
 from sqlalchemy import inspect
 import os
+from flask_jwt_extended import JWTManager
 
 db = SQLAlchemy()
 
@@ -26,7 +27,9 @@ def create_app() -> Flask:
         SQLALCHEMY_ECHO=debug,
         CRUD_GET_USER=lambda: Human(name=USER_NAME),
         CRUD_ACCESS_CHECKS_ENABLED=True,
+        SECRET_KEY="wnt2die",
     )
+    JWTManager(app)
     db.init_app(app)
     api.init_app(app)
     CRUD(app)
