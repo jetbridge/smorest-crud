@@ -42,18 +42,7 @@ class PetCollection(CollectionView):
 
     def get(self):
         query = super().get()
-
-        # check prefetch worked
-        first = query.first()
-
-        return jsonify(
-            {
-                "loaded": {
-                    "first.human": is_rel_loaded(first, "human"),
-                    "first.human.cars": is_rel_loaded(first.human, "cars"),
-                }
-            }
-        )
+        return query.filter_by(name='mischa')
 
     @pet_blp.arguments(PetSchema)
     @pet_blp.response(PetSchema)
