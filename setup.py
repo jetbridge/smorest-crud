@@ -3,17 +3,19 @@ from setuptools import setup, find_packages
 with open("README.md") as f:
     long_description = f.read()
 
-NAME = "flask_crud"
-DESCRIPTION = "Reusable CRUD endpoints using flask-rest-api."
-VERSION = "0.0.1"
+NAME = "smorest-crud"
+DESCRIPTION = (
+    "Reusable CRUD endpoints using flask-smorest, flask-jwt-extended, and SQLAlchemy."
+)
+VERSION = "0.0.4"
 REQUIRES_PYTHON = ">=3.6.0"
 
 setup(
     name=NAME,
     version=VERSION,
     python_requires=REQUIRES_PYTHON,
-    url="https://github.com/jetbridge/flask-crud",
-    license="ABRMS",
+    url="https://github.com/jetbridge/smorest-crud",
+    license="MIT",
     author="JetBridge",
     author_email="me@mish.dev",
     description=DESCRIPTION,
@@ -26,6 +28,10 @@ setup(
     zip_safe=False,
     include_package_data=True,
     platforms="any",
-    install_requires=["Flask", "flask_sqlalchemy", "flask-rest-api"],
-
+    install_requires=[
+        "Flask",
+        "flask_sqlalchemy",
+        "flask-smorest",
+        "flask_jwt_extended",
+    ],
 )
