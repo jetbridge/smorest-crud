@@ -1,4 +1,6 @@
 from typing import Iterable, Optional
+from uuid import UUID
+
 from flask.views import MethodView
 from flask_smorest import abort
 from flask_sqlalchemy import BaseQuery, Model, SQLAlchemy
@@ -164,9 +166,15 @@ class ResourceView(CRUDView):
     delete_enabled: bool = False
 
     def _lookup(self, pk):
-        """Get model by primary key."""
-        item = self.model.query.get_or_404(pk)
-        return item
+        """Get model by primary key or extid."""
+        if isinstance(pk, int) or str.isdigit(pk):
+            item = self.model.query.get_or_404(pk)
+            return item
+        else:
+            item = self.model.query.filter_by(extid=pk).one_or_none()
+            if not item:
+                abort(404)
+            return item
 
     def get(self, pk) -> BaseQuery:
         if not self.get_enabled:

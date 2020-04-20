@@ -1,11 +1,11 @@
 from flask.testing import FlaskClient
 from smorest_crud.test.app import USER_NAME
+from smorest_crud.test.db import db
 
 
 def test_list(client: FlaskClient, pets):
     res = client.get("/human")
     assert res.status_code == 200
-
     res = res.json
     assert len(res) == 10
 
@@ -13,15 +13,17 @@ def test_list(client: FlaskClient, pets):
     assert res[0]["pets"][0]["genus"]
 
 
-def test_get(client: FlaskClient, pets, db):
+def test_get(client: FlaskClient, pets):
     human = pets[0].human
     human.name = USER_NAME  # for access check
     db.session.commit()
 
-    res = client.get(f"/human/{human.id}")
+    res = client.get(f"/human/{human.extid}")
     assert res.status_code == 200
     human = res.json
     assert "name" in human
+
+
 
     prefetched = client.get(f"/pet").json["loaded"]
     assert prefetched["first.human"], "failed to prefetch rel 'human'"
@@ -45,7 +47,7 @@ def test_patch(client: FlaskClient, pets):
     assert pet["species"] == "Canis"
 
 
-def test_delete(client: FlaskClient, pets, db):
+def test_delete(client: FlaskClient, pets):
     res = client.delete(f"/pet/{pets[0].id}")
     assert res.status_code == 200
 
@@ -55,10 +57,10 @@ def test_delete(client: FlaskClient, pets, db):
 
 def test_disallowed(client: FlaskClient, pets):
     # delete disabled
-    assert client.delete("/human/2").status_code == 405
+    assert client.delete(f"/human/{2}").status_code == 405
 
     # human has get_enabled
-    assert client.get("/human/2000").status_code == 404
+    assert client.get(f"/human/{2000}").status_code == 404
 
     # pointless doesn't allow anything
     assert client.post("/pointless").status_code == 405
