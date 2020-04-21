@@ -65,12 +65,12 @@ def client_unauthenticated(app):
 
 
 @pytest.fixture
-def pets(pet_factory, db_session):
-    pets = [pet_factory.create() for n in range(10)]
+def pets(pet_factory):
+    pets = [pet_factory() for n in range(10)]
 
     db.session.add_all(pets)
     db.session.commit()
-    return pets
+    yield pets
 
 
 @register

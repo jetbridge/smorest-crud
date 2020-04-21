@@ -32,7 +32,6 @@ bento-cli = "*"
 psycopg2 = "*"
 pytest-postgresql = "*"
 pytest-flask-sqlalchemy = "*"
-jetkit = "*"
 jetkit-flask = "*"
 
 [requires]
