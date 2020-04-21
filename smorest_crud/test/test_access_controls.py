@@ -16,7 +16,7 @@ def test_create(client: FlaskClient, client_unauthenticated: FlaskClient):
     assert res.status_code == 401
 
 
-def test_update(client: FlaskClient, pet_factory, db_session):
+def test_update(client: FlaskClient, pet_factory):
     pets = [pet_factory.create() for n in range(10)]
     db.session.add_all(pets)
     db.session.commit()

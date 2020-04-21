@@ -6,13 +6,20 @@ from flask_smorest import Blueprint, abort
 from sqlalchemy import inspect
 from flask_smorest import Api
 from smorest_crud import CRUD, CollectionView, ResourceView
+from smorest_crud.test.app.model import Pet, Human, Car
 from smorest_crud.test.db import db
-from sqlalchemy import Column, Integer, Text, ForeignKey
-from sqlalchemy.orm import relationship
-from smorest_crud import AccessControlUser
-from flask_sqlalchemy import BaseQuery
 from marshmallow import fields as f, Schema
-from jetkit.db.extid import ExtID
+
+debug = bool(os.getenv("DEBUG"))
+
+USER_NAME = "mischa"
+
+DB_CONN = os.getenv(
+    "SQLALCHEMY_DATABASE_URI", "postgresql:///smorest_crud_test".lower()
+)
+DB_OPTS = sa.engine.url.make_url(DB_CONN).translate_connect_args()
+DB_VERSION = "11.5"
+api = Api()
 
 
 class HumanSchema(Schema):
@@ -25,7 +32,7 @@ class HumanSchema(Schema):
 
 class PetSchemaLite(Schema):
     id = f.Integer(dump_only=True)  # not editable
-    extid =f.UUID(dump_only=True)
+    extid = f.UUID(dump_only=True)
     genus = f.String()
     species = f.String()
     human = f.Nested(HumanSchema, exclude=("pets",))
@@ -35,61 +42,6 @@ class PetSchema(PetSchemaLite):
     edible = f.Boolean()
 
 
-class Pet(db.Model, ExtID):  # noqa: T484
-    id = Column(Integer, primary_key=True)
-    genus = Column(Text)
-    species = Column(Text)
-    edible = Column(Text)
-    human_id = Column(ForeignKey("human.id"))
-    human = relationship("Human", back_populates="pets")
-    cars = relationship("Car", secondary="human")
-
-    @classmethod
-    def query_for_user(cls, user) -> BaseQuery:
-        return cls.query
-
-
-Pet.add_create_uuid_extension_trigger()
-
-
-class Human(db.Model, AccessControlUser, ExtID):  # noqa: T484
-    id = Column(Integer, primary_key=True)
-    name = Column(Text)
-
-    pets = relationship("Pet", back_populates="human")
-    cars = relationship("Car", back_populates="owner")
-
-    # private
-    not_allowed = Column(Text)
-
-    def user_can_write(self, user) -> bool:
-        return self.name == user.name
-
-    @classmethod
-    def query_for_user(cls, user) -> BaseQuery:
-        return cls.query
-
-
-Human.add_create_uuid_extension_trigger()
-
-
-class Car(db.Model):  # noqa: T484
-    id = Column(Integer, primary_key=True)
-
-    owner_id = Column(ForeignKey("human.id"))
-    owner = relationship("Human", back_populates="cars")
-
-
-debug = bool(os.getenv("DEBUG"))
-
-USER_NAME = "mischa"
-
-DB_CONN = os.getenv(
-    "SQLALCHEMY_DATABASE_URI", "postgresql:///smorest_crud_test".lower()
-)
-DB_OPTS = sa.engine.url.make_url(DB_CONN).translate_connect_args()
-DB_VERSION = "11.5"
-api = Api()
 blp_pet = Blueprint("Pet", __name__, url_prefix="/pet")
 
 

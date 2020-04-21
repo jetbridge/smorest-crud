@@ -14,6 +14,7 @@ def test_list(client: FlaskClient, pets):
 
 
 def test_get(client: FlaskClient, pets):
+    """Test getting by regular id and extid."""
     human = pets[0].human
     human.name = USER_NAME  # for access check
     db.session.commit()
@@ -23,7 +24,10 @@ def test_get(client: FlaskClient, pets):
     human = res.json
     assert "name" in human
 
-
+    res = client.get(f"/human/{pets[0].human.id}")
+    assert res.status_code == 200
+    assert res.json == human
+    assert "name" in human
 
     prefetched = client.get(f"/pet").json["loaded"]
     assert prefetched["first.human"], "failed to prefetch rel 'human'"
