@@ -20,3 +20,8 @@ def test_update(client: FlaskClient, pets):
     assert res.status_code == 200
     pet = res.json
     assert pet["species"] == "Canis"
+
+
+def test_list_no_acl(client: FlaskClient):
+    res = client.get("/human/car")
+    assert res.status_code == 200
