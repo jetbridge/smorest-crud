@@ -31,6 +31,7 @@ extensions = [
     "sphinx.ext.viewcode",
     "sphinx_autodoc_typehints",
     "recommonmark",
+    "sphinxcontrib.apidoc",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -54,32 +55,35 @@ html_theme = "sphinx_rtd_theme"
 html_static_path = ["_static"]
 
 apidoc_excluded_paths = ["test"]
+apidoc_module_dir = "../smoret_crud"
+apidoc_output_dir = "source"
+apidoc_separate_modules = True
 # set_type_checking_flag = True
 
 
 # -- Automatically run sphinx-apidoc --------------------------------------
 
 
-def run_apidoc(_):
-    from sphinx import apidoc
+# def run_apidoc(_):
+#     from sphinx import apidoc
 
-    docs_path = os.path.dirname(__file__)
-    apidoc_path = os.path.join(docs_path, "source")
-    module_path = os.path.join(docs_path, "..", "smorest_crud")
+#     docs_path = os.path.dirname(__file__)
+#     apidoc_path = os.path.join(docs_path, "source")
+#     module_path = os.path.join(docs_path, "..", "smorest_crud")
 
-    apidoc.main(
-        [
-            "--force",
-            "--module-first",
-            "--separate",
-            "-d",
-            "3",
-            "-o",
-            apidoc_path,
-            module_path,
-        ]
-    )
+#     apidoc.main(
+#         [
+#             "--force",
+#             "--module-first",
+#             "--separate",
+#             "-d",
+#             "3",
+#             "-o",
+#             apidoc_path,
+#             module_path,
+#         ]
+#     )
 
 
-def setup(app):
-    app.connect("builder-inited", run_apidoc)
+# def setup(app):
+#     app.connect("builder-inited", run_apidoc)
