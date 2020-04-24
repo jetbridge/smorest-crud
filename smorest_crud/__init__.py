@@ -12,7 +12,23 @@ _crud = LocalProxy(lambda: current_app.extensions["crud"])
 
 
 class AccessControlUser:
-    """A model mixin to implement access checks for a given model/user."""
+    """A model mixin to implement access checks for a given model/user.
+
+    Required on all models for views with access checks enabled.
+
+    Example::
+
+        class Pet(Model, AccessControlUser):
+            @classmethod
+            def query_for_user(cls, user) -> Optional[BaseQuery]:
+                return cls.query.filter_by(owner=user)
+
+            def user_can_read(self, user) -> bool:
+                return self.user_can_write(user) or self.owner.id == user.id
+
+            def user_can_write(self, user) -> bool:
+                return user.is_admin  # only administrators can edit pets
+    """
 
     @classmethod
     def query_for_user(cls, user: "AccessControlUser") -> Optional[BaseQuery]:
@@ -20,22 +36,47 @@ class AccessControlUser:
         return None
 
     def user_can_read(self, user: "AccessControlUser") -> bool:
-        """Can `user` view this object."""
+        """Check if `user` is allowed to access this object at all.
+
+        Defaults to calling `self.user_can_write(user)`.
+        """
         return self.user_can_write(user)
 
     def user_can_write(self, user: "AccessControlUser") -> bool:
+        """Check if `user` can make any modifications to this object (update, delete)."""
         raise NotImplementedError(
             f"user_can_write(self, user) not implemented on {self}"
         )
 
     def user_can_create(self, user: "AccessControlUser", args: Optional[dict]) -> bool:
-        # TODO: not needed right now - maybe can implement if needed
+        """Check if `user` is allowed to create.
+
+        TODO: not implemented.
+        """
         raise NotImplementedError(
             f"user_can_create(self, user, args) not implemented on {self}"
         )
 
 
 class CRUD(object):
+    """Flask extension to enable CRUD REST functionality.
+
+    Sample full app configuration::
+
+        from smorest_crud import CRUD
+        from flask_jwt_extended import JWTManager, get_current_user
+
+        app = Flask()
+        JWTManager(app)
+        CRUD(app)
+
+        app.config.update(
+            CRUD_GET_USER=get_current_user,
+            CRUD_ACCESS_CHECKS_ENABLED=True,
+            SECRET_KEY="wnt2die",
+        )
+    """
+
     db: SQLAlchemy
     app: Flask
     get_user: Optional[Callable]

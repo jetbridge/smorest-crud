@@ -37,13 +37,16 @@ class PetCollection(CollectionView):
     create_enabled = True
     list_enabled = True
 
+    @pet_blp.response(PetSchema(many=True))
     def get(self):
+        """List pets."""
         query = super().get()
         return query.filter_by(name='mischa')
 
     @pet_blp.arguments(PetSchema)
-    @pet_blp.response(PetSchema)
+    @pet_blp.response(PetSchema(many=True))
     def post(self, args):
+        """Create a pet."""
         return super().post(args)
 
 
