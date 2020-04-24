@@ -14,6 +14,8 @@ werkzeug = "*"
 sphinx = {version = "!=3.0.2", optional = true}
 sphinx-autodoc-typehints = {version = "*", optional = true}
 sphinx-rtd-theme = {version = "*", optional = true}
+recommonmark = {version = "*", optional = true}
+
 
 [tool.poetry.dev-dependencies]
 bento-cli = "*"
@@ -36,7 +38,7 @@ twine = "*"
 watchdog = "*"
 
 [tool.poetry.extras]
-doc = ["sphinx", "sphinx-autodoc-typehints", "sphinx-rtd-theme"]
+doc = ["sphinx", "sphinx-autodoc-typehints", "sphinx-rtd-theme", "recommonmark"]
 
 [build-system]
 requires = ["poetry>=0.12"]

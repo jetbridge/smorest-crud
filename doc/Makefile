@@ -22,4 +22,6 @@ help:
 
 apidoc:
 	rm -rf source
+	mkdir -p source
+	ln -s ../../README.md source/
 	sphinx-apidoc ../smorest_crud -f -o source
