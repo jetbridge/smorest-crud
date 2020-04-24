@@ -1,9 +1,6 @@
 # Flask Smorest CRUD
 _Why repeat yourself?_
 
-# What is this?
-Right now, a work in progress.
-
 This library aims to tie together Flask-SQLAlchemy and Flask-Smorest to implement a sane default but easily customizable CRUD API based on SQLAlchemy models inside of Flask.
 
 # Quickstart
