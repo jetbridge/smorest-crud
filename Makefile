@@ -1,4 +1,4 @@
-.PHONY: doc
+.PHONY: docs
 
-doc:
-	$(MAKE) -C doc html
+docs:
+	$(MAKE) -C docs html
