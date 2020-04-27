@@ -55,7 +55,7 @@ html_theme = "sphinx_rtd_theme"
 html_static_path = ["_static"]
 
 apidoc_excluded_paths = ["test"]
-apidoc_module_dir = "../smoret_crud"
+apidoc_module_dir = "../smorest_crud"
 apidoc_output_dir = "source"
 apidoc_separate_modules = True
 # set_type_checking_flag = True
@@ -85,5 +85,5 @@ def run_apidoc(_):
     )
 
 
-def setup(app):
-    app.connect("builder-inited", run_apidoc)
+# def setup(app):
+#     app.connect("builder-inited", run_apidoc)
