@@ -28,19 +28,23 @@ class CRUDView(MethodView):
 
     def query_for_user(self) -> BaseQuery:
         model_cls = self._get_model()
-        if not hasattr(model_cls, "query_for_user"):
+
+        # try to filter the query by current user
+        query = model_cls.query
+        if hasattr(model_cls, "query_for_user"):
+            # filter query by user
+            user = self._get_current_user()
+            query = model_cls.query_for_user(user)
+
+            # we expect a query back unless check failed
+            if not query:
+                self._abort_access_check_failed(model_cls)
+
+        elif self._access_checks_enabled():
+            # can't filter by user
             raise NotImplementedError(
                 f"{model_cls} does not implement query_for_user() and access control checks are enabled"
             )
-
-        user = self._get_current_user()
-        # XXX: do we require user?
-
-        query = model_cls.query_for_user(user)
-
-        # assert we got a query back
-        if not query:
-            self._abort_access_check_failed(model_cls)
 
         return query
 

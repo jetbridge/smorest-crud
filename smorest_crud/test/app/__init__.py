@@ -58,6 +58,10 @@ class PetSchema(PetSchemaLite):
     edible = f.Boolean()
 
 
+class CarSchema(Schema):
+    id = f.Integer()
+
+
 pet_blp = Blueprint("pets", "pets", url_prefix="/pet")
 
 
@@ -167,6 +171,18 @@ class PointlessCollection(CollectionView):
 @pointless_blp.route("/<int:pk>")
 class PointlessResource(ResourceView):
     model = Car
+
+
+@human_blp.route("/car")
+class CarCollection(CollectionView):
+    model = Car
+
+    access_checks_enabled = False
+    list_enabled = True
+
+    @human_blp.response(CarSchema(many=True))
+    def get(self):
+        return super().get()
 
 
 def is_rel_loaded(item, attr_name):
