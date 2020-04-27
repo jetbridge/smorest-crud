@@ -58,32 +58,5 @@ apidoc_excluded_paths = ["test"]
 apidoc_module_dir = "../smorest_crud"
 apidoc_output_dir = "source"
 apidoc_separate_modules = True
+
 # set_type_checking_flag = True
-
-
-# -- Automatically run sphinx-apidoc --------------------------------------
-
-
-def run_apidoc(_):
-    from sphinx import apidoc
-
-    docs_path = os.path.dirname(__file__)
-    apidoc_path = os.path.join(docs_path, "source")
-    module_path = os.path.join(docs_path, "..", "smorest_crud")
-
-    apidoc.main(
-        [
-            "--force",
-            "--module-first",
-            "--separate",
-            "-d",
-            "3",
-            "-o",
-            apidoc_path,
-            module_path,
-        ]
-    )
-
-
-# def setup(app):
-#     app.connect("builder-inited", run_apidoc)
