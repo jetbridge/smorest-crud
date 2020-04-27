@@ -64,26 +64,26 @@ apidoc_separate_modules = True
 # -- Automatically run sphinx-apidoc --------------------------------------
 
 
-# def run_apidoc(_):
-#     from sphinx import apidoc
+def run_apidoc(_):
+    from sphinx import apidoc
 
-#     docs_path = os.path.dirname(__file__)
-#     apidoc_path = os.path.join(docs_path, "source")
-#     module_path = os.path.join(docs_path, "..", "smorest_crud")
+    docs_path = os.path.dirname(__file__)
+    apidoc_path = os.path.join(docs_path, "source")
+    module_path = os.path.join(docs_path, "..", "smorest_crud")
 
-#     apidoc.main(
-#         [
-#             "--force",
-#             "--module-first",
-#             "--separate",
-#             "-d",
-#             "3",
-#             "-o",
-#             apidoc_path,
-#             module_path,
-#         ]
-#     )
+    apidoc.main(
+        [
+            "--force",
+            "--module-first",
+            "--separate",
+            "-d",
+            "3",
+            "-o",
+            apidoc_path,
+            module_path,
+        ]
+    )
 
 
-# def setup(app):
-#     app.connect("builder-inited", run_apidoc)
+def setup(app):
+    app.connect("builder-inited", run_apidoc)
