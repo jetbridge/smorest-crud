@@ -29,7 +29,7 @@ setup(
     include_package_data=True,
     platforms="any",
     install_requires=[
-        "flask",
+        "Flask",
         "flask_sqlalchemy",
         "flask-smorest",
         "flask_jwt_extended",
