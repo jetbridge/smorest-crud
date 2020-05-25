@@ -1,3 +1,5 @@
+[![Documentation Status](https://readthedocs.org/projects/smorest-crud/badge/?version=latest)](https://smorest-crud.readthedocs.io/en/latest/?badge=latest)
+
 # Flask Smorest CRUD
 _Why repeat yourself?_
 
