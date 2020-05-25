@@ -1,5 +1,7 @@
+---
+build:
+  image: latest
+
 python:
-   version: 3.8
-   install:
-      - requirements: docs/requirements.txt
-      - method: setuptools
+  version: 3.8
+  pip_install: true
