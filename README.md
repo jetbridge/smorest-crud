@@ -1,8 +1,7 @@
+[![Documentation Status](https://readthedocs.org/projects/smorest-crud/badge/?version=latest)](https://smorest-crud.readthedocs.io/en/latest/?badge=latest)
+
 # Flask Smorest CRUD
 _Why repeat yourself?_
-
-# What is this?
-Right now, a work in progress.
 
 This library aims to tie together Flask-SQLAlchemy and Flask-Smorest to implement a sane default but easily customizable CRUD API based on SQLAlchemy models inside of Flask.
 
@@ -40,13 +39,16 @@ class PetCollection(CollectionView):
     create_enabled = True
     list_enabled = True
 
+    @pet_blp.response(PetSchema(many=True))
     def get(self):
+        """List pets."""
         query = super().get()
         return query.filter_by(name='mischa')
 
     @pet_blp.arguments(PetSchema)
-    @pet_blp.response(PetSchema)
+    @pet_blp.response(PetSchema(many=True))
     def post(self, args):
+        """Create a pet."""
         return super().post(args)
 
 

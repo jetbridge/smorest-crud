@@ -14,19 +14,32 @@ config_keys = dict(get_user="CRUD_GET_USER")
 
 
 class CRUDView(MethodView):
-    """Base class for collection and resource views."""
+    """Base class for collection and resource views.
 
-    # define these, please
+    This works like `Flask MethodView <https://flask.palletsprojects.com/en/1.1.x/views/#method-views-for-apis>`_;
+    python methods are named after HTTP verbs.
+    """
+
     model: Model
-    access_checks_enabled: bool = True
+    """SQLAlchemy model we are providing CRUD services for."""
 
-    # default
+    access_checks_enabled: bool = True
+    """Whether or not to apply access checks to models.
+
+    Requires `CRUD_ACCESS_CHECKS_ENABLED` configuration to be enabled."""
+
     decorators = [jwt_required]
+    """List of decorators to apply to view functions.
+
+    Applies `jwt_required <https://flask-jwt-extended.readthedocs.io/en/stable/api/#flask_jwt_extended.jwt_required>`_ by default to required authenticated requests.
+    """
 
     def query(self) -> BaseQuery:
+        """Return query for `model`."""
         return self._get_model().query
 
     def query_for_user(self) -> BaseQuery:
+        """Produce a query for current model, filtered by `model.query_for_user(current_user)`."""
         model_cls = self._get_model()
 
         # try to filter the query by current user
@@ -108,15 +121,47 @@ class CRUDView(MethodView):
 
 class CollectionView(CRUDView):
     """API view that can manage listing items in a collection or creating a new item.
+
+    Example::
+
+        from flask_smorest import Blueprint
+        from smorest_crud import CollectionView
+
+        pet_blp = Blueprint("pets", "pets", url_prefix="/pet")
+
+        @pet_blp.route("")
+        class PetCollection(CollectionView):
+            model = Pet
+            prefetch = [Pet.human, (Pet.human, Human.cars)]  # joinedload
+            access_checks_enabled = False
+
+            create_enabled = True
+            list_enabled = True
+
+            @pet_blp.response(PetSchema(many=True))
+            def get(self):
+                query = super().get()
+                return query.filter_by(name='mischa')
+
+            @pet_blp.arguments(PetSchema)
+            @pet_blp.response(PetSchema(many=True))
+            def post(self, args):
+                return super().post(args)
     """
 
-    create_enabled: bool = False
     list_enabled: bool = False
+    """Enable GET."""
+
+    create_enabled: bool = False
+    """Enable POST."""
 
     prefetch: Iterable[RelationshipProperty] = []
+    """List of relationships to `prefetch <https://docs.sqlalchemy.org/en/13/orm/loading_relationships.html#relationship-loading-with-loader-options>`_ when listing."""
 
     def get(self) -> BaseQuery:
-        """List collection."""
+        """List collection.
+
+        :returns: query or iterable of `Model`s."""
         if not self.list_enabled:
             abort(405)
 
@@ -127,7 +172,11 @@ class CollectionView(CRUDView):
         return query
 
     def post(self, args=None):
-        """Create new model."""
+        """Create new model.
+
+        :param args: Deserialized schema args.
+        :returns: Newly-created model.
+        """
         if not self.create_enabled:
             abort(405)
 
@@ -146,7 +195,7 @@ class CollectionView(CRUDView):
         if self.prefetch:
             # apply joinedloaded rels
             for rels in self.prefetch:
-                if is_listy(rels):
+                if _is_listy(rels):
                     # list/tuple, construct chain of joinedloads
                     if len(rels) > 1:
                         opts = reduce(
@@ -163,9 +212,53 @@ class CollectionView(CRUDView):
 
 
 class ResourceView(CRUDView):
+    """Operations to perform on an item, identified in the URL route by a key.
+
+    GET /pet/42 -- Fetch pet `42`.
+
+    PATCH /pet/42 -- Update pet `42`.
+
+    DELETE /pet/42 -- Delete pet `42`.
+
+    Example::
+
+        from flask_smorest import Blueprint
+        from smorest_crud import ResourceView
+
+        pet_blp = Blueprint("pets", "pets", url_prefix="/pet")
+
+        @pet_blp.route("/<int:pk>")
+        class PetResource(ResourceView):
+            model = Pet
+
+            access_checks_enabled = True
+            get_enabled = True
+            update_enabled = True
+            delete_enabled = True
+
+            @pet_blp.response(PetSchema)
+            def get(self, pk):
+                return super().get(pk)
+
+            @pet_blp.arguments(PetSchema)
+            @pet_blp.response(PetSchema)
+            def patch(self, args, pk):
+                return super().patch(args, pk)
+
+            @pet_blp.response(PetSchema)
+            def delete(self, pk):
+                return super().delete(pk)
+
+    """
+
     get_enabled: bool = False
+    """Enable GET."""
+
     update_enabled: bool = False
+    """Enable PATCH."""
+
     delete_enabled: bool = False
+    """Enable DELETE."""
 
     def _lookup(self, pk):
         """Get model by primary key."""
@@ -173,6 +266,9 @@ class ResourceView(CRUDView):
         return item
 
     def get(self, pk) -> BaseQuery:
+        """Retreieve model by primary key.
+
+        :param pk: Primary key identifier."""
         if not self.get_enabled:
             abort(405)
 
@@ -182,6 +278,12 @@ class ResourceView(CRUDView):
         return item
 
     def patch(self, args=None, pk=None) -> BaseQuery:
+        """Update model.
+
+        :param args: Deserialized request model args.
+        :param pk: Primary key identifier.
+        :returns: Updated model.
+        """
         if not self.update_enabled:
             abort(405)
 
@@ -191,11 +293,15 @@ class ResourceView(CRUDView):
         item = self._lookup(pk)
         self._check_can_write(item)
 
-        update_attrs(item, **args)
+        _update_attrs(item, **args)
         self._db.session.commit()
         return item
 
     def delete(self, pk) -> BaseQuery:
+        """Delete model.
+
+        :param pk: Primary key identifier.
+        """
         if not self.delete_enabled:
             abort(405)
 
@@ -206,13 +312,13 @@ class ResourceView(CRUDView):
         self._db.session.commit()
 
 
-def update_attrs(item, **kwargs):
+def _update_attrs(item, **kwargs):
     """Set a dictionary of attributes."""
     for attr, value in kwargs.items():
         if hasattr(item, attr):
             setattr(item, attr, value)
 
 
-def is_listy(thing) -> bool:
+def _is_listy(thing) -> bool:
     t = type(thing)
     return t is list or t is tuple or t is set

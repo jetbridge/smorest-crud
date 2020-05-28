@@ -7,7 +7,7 @@ NAME = "smorest-crud"
 DESCRIPTION = (
     "Reusable CRUD endpoints using flask-smorest, flask-jwt-extended, and SQLAlchemy."
 )
-VERSION = "0.0.4"
+VERSION = "1.0.0"
 REQUIRES_PYTHON = ">=3.6.0"
 
 setup(
@@ -29,7 +29,7 @@ setup(
     include_package_data=True,
     platforms="any",
     install_requires=[
-        "Flask",
+        "flask",
         "flask_sqlalchemy",
         "flask-smorest",
         "flask_jwt_extended",

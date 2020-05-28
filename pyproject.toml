@@ -1,0 +1,45 @@
+[tool.poetry]
+name = "smorest_crud"
+version = "0.0.0"
+description = "CRUD for Flask, SQLAlchemy, JWT, Smorest"
+authors = ["Mischa Spiegelmock <mischa@jetbridge.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.7.0"
+flask = "*"
+flask-jwt-extended = "*"
+flask-smorest = "*"
+flask-sqlalchemy = "*"
+werkzeug = "*"
+sphinx = {version = "!=3.0.2", optional = true}
+sphinx-autodoc-typehints = {version = "*", optional = true}
+sphinx-rtd-theme = {version = "*", optional = true}
+recommonmark = {version = "*", optional = true}
+
+
+[tool.poetry.dev-dependencies]
+bento-cli = "*"
+black = "^19.3b0"
+epc = "*"
+flake8 = "*"
+flask-shell-ipython = "*"
+importmagic = "*"
+ipdb = "*"
+mypy = "*"
+mypy-extensions = ">=0.4.1"
+pre-commit = "*"
+pyls-black = "*"
+pyls-isort = "*"
+pyls-mypy = "*"
+pytest = "*"
+pytest-factoryboy = "*"
+pytest-xdist = "*"
+twine = "*"
+watchdog = "*"
+
+[tool.poetry.extras]
+doc = ["sphinx", "sphinx-autodoc-typehints", "sphinx-rtd-theme", "recommonmark"]
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
