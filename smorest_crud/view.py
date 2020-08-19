@@ -183,8 +183,7 @@ class CollectionView(CRUDView):
         # create
         item = self.model(**args)
 
-        # access check should be done in subclass (for now)
-        # self._check_can_create(item, args=args)
+        self._check_can_create(item, args=args)
 
         self._db.session.add(item)
 

@@ -2,7 +2,7 @@ from flask.testing import FlaskClient
 
 
 def test_create(client: FlaskClient, client_unauthenticated: FlaskClient):
-    res = client.post(f"/human", json={"name": "fred"})
+    res = client.post(f"/human", json={"name": "mischa"})
     assert res.status_code == 200
 
     # post with data that fails access check

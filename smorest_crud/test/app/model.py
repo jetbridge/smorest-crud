@@ -1,3 +1,5 @@
+from typing import Optional
+
 from smorest_crud.test.app import db
 from sqlalchemy import Column, Integer, Text, ForeignKey
 from sqlalchemy.orm import relationship
@@ -31,6 +33,9 @@ class Human(db.Model, AccessControlUser):  # noqa: T484
     not_allowed = Column(Text)
 
     def user_can_write(self, user) -> bool:
+        return self.name == user.name
+
+    def user_can_create(self, user, args: Optional[dict]) -> bool:
         return self.name == user.name
 
     @classmethod
