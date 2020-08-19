@@ -49,13 +49,8 @@ class AccessControlUser:
         )
 
     def user_can_create(self, user: "AccessControlUser", args: Optional[dict]) -> bool:
-        """Check if `user` is allowed to create.
-
-        TODO: not implemented.
-        """
-        raise NotImplementedError(
-            f"user_can_create(self, user, args) not implemented on {self}"
-        )
+        """Check if `user` is allowed to create."""
+        return True
 
 
 class CRUD(object):
