@@ -292,7 +292,7 @@ class ResourceView(CRUDView):
         item = self._lookup(pk)
         self._check_can_write(item)
 
-        _update_attrs(item, **args)
+        _update_attrs(item, args)
         self._db.session.commit()
         return item
 
@@ -311,9 +311,9 @@ class ResourceView(CRUDView):
         self._db.session.commit()
 
 
-def _update_attrs(item, **kwargs):
+def _update_attrs(item, attrs):
     """Set a dictionary of attributes."""
-    for attr, value in kwargs.items():
+    for attr, value in attrs.items():
         if hasattr(item, attr):
             setattr(item, attr, value)
 
