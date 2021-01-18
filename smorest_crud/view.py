@@ -5,12 +5,11 @@ from flask_sqlalchemy import BaseQuery, Model, SQLAlchemy
 from sqlalchemy.orm import RelationshipProperty, joinedload
 from functools import reduce
 from flask_jwt_extended import jwt_required
-from smorest_crud import _crud, AccessControlUser
+from smorest_crud import _crud, config_keys
+from smorest_crud.access_control import AccessControlUser
 import logging
 
 log = logging.getLogger(__name__)
-
-config_keys = dict(get_user="CRUD_GET_USER")
 
 
 class CRUDView(MethodView):

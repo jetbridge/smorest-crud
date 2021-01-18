@@ -1,9 +1,10 @@
-from typing import Optional
+from typing import Optional, Type
 
+from smorest_crud.access_control.models import T
 from smorest_crud.test.app import db
 from sqlalchemy import Column, Integer, Text, ForeignKey
 from sqlalchemy.orm import relationship
-from smorest_crud import AccessControlUser
+from smorest_crud import AccessControlUser, AccessControlQuery
 from flask_sqlalchemy import BaseQuery
 
 
@@ -43,8 +44,18 @@ class Human(db.Model, AccessControlUser):  # noqa: T484
         return cls.query
 
 
-class Car(db.Model):  # noqa: T484
+class CarQuery(AccessControlQuery):
+    def query_for_user(self, user: Type[T]) -> "CarQuery":
+        return self.filter_by(owner_id=user.id)
+
+
+class Car(db.Model, AccessControlUser):  # noqa: T484
+    query_class = CarQuery
+
     id = Column(Integer, primary_key=True)
 
     owner_id = Column(ForeignKey("human.id"))
     owner = relationship("Human", back_populates="cars")
+
+    def user_can_write(self, user: "AccessControlUser") -> bool:
+        return True
