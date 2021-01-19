@@ -39,36 +39,39 @@ def test_get_for_user_or_404(car_factory, db):
     db.session.commit()
 
     # getting instance with success
-    car = Car.get_for_user_or_404(car_1.owner, car_1.id, key_attr="id")
+    car = Car.get_for_user_or_404(car_1.owner, car_1.id)
     assert car
     assert car == car_1
 
-    car = Car.get_for_user_or_404(car_2.owner, car_2.id, key_attr="id")
+    car = Car.get_for_user_or_404(car_2.owner, car_2.id)
     assert car
     assert car == car_2
 
     # getting not accessible instance with aborting
     with patch("smorest_crud.access_control.models.abort") as abort_mock:
-        car = Car.get_for_user_or_404(car_1.owner, car_2.id, key_attr="id")
+        car = Car.get_for_user_or_404(car_1.owner, car_2.id)
         assert car is None
         assert abort_mock.called_once_with(404)
 
     with patch("smorest_crud.access_control.models.abort") as abort_mock:
-        car = Car.get_for_user_or_404(car_2.owner, car_1.id, key_attr="id")
+        car = Car.get_for_user_or_404(car_2.owner, car_1.id)
         assert car is None
         assert abort_mock.called_once_with(404)
 
     # trying to get not existing instance
     with patch("smorest_crud.access_control.models.abort") as abort_mock:
-        car = Car.get_for_user_or_404(car_2.owner, car_2.id + 10, key_attr="id")
+        car = Car.get_for_user_or_404(car_2.owner, car_2.id + 10)
         assert car is None
         assert abort_mock.called_once_with(404)
 
 
-def test_get_for_user_or_404_no_attr(car_factory, db):
+def test_get_for_user_or_404_no_attr(car_factory, db, app):
     car = car_factory()
     db.session.add(car)
     db.session.commit()
+
+    # setting not existing column name in extension setup
+    app.extensions["crud"].key_attr = "extid"
 
     # trying to get not existing column
     with pytest.raises(AttributeError) as e:
@@ -85,13 +88,13 @@ def test_get_for_current_user_or_404(car_factory, db):
     # getting instance with success
     with patch("smorest_crud.access_control.utils._get_current_user") as get_current_user_mock:
         get_current_user_mock.return_value = car_1.owner
-        car = get_for_current_user_or_404(Car, car_1.id, key_attr="id")
+        car = get_for_current_user_or_404(Car, car_1.id)
         assert car
         assert car == car_1
 
     with patch("smorest_crud.access_control.utils._get_current_user") as get_current_user_mock:
         get_current_user_mock.return_value = car_2.owner
-        car = get_for_current_user_or_404(Car, car_2.id, key_attr="id")
+        car = get_for_current_user_or_404(Car, car_2.id)
         assert car
         assert car == car_2
 
@@ -99,14 +102,14 @@ def test_get_for_current_user_or_404(car_factory, db):
     with patch("smorest_crud.access_control.utils._get_current_user") as get_current_user_mock, \
             patch("smorest_crud.access_control.models.abort") as abort_mock:
         get_current_user_mock.return_value = car_2.owner
-        car = get_for_current_user_or_404(Car, car_1.id, key_attr="id")
+        car = get_for_current_user_or_404(Car, car_1.id)
         assert car is None
         assert abort_mock.called_once_with(404)
 
     with patch("smorest_crud.access_control.utils._get_current_user") as get_current_user_mock, \
             patch("smorest_crud.access_control.models.abort") as abort_mock:
         get_current_user_mock.return_value = car_1.owner
-        car = get_for_current_user_or_404(Car, car_2.id, key_attr="id")
+        car = get_for_current_user_or_404(Car, car_2.id)
         assert car is None
         assert abort_mock.called_once_with(404)
 
@@ -114,15 +117,18 @@ def test_get_for_current_user_or_404(car_factory, db):
     with patch("smorest_crud.access_control.utils._get_current_user") as get_current_user_mock, \
             patch("smorest_crud.access_control.models.abort") as abort_mock:
         get_current_user_mock.return_value = car_1.owner
-        car = get_for_current_user_or_404(Car, car_1.id + 10, key_attr="id")
+        car = get_for_current_user_or_404(Car, car_1.id + 10)
         assert car is None
         assert abort_mock.called_once_with(404)
 
 
-def test_get_for_current_user_or_404_no_attr(car_factory, db):
+def test_get_for_current_user_or_404_no_attr(car_factory, db, app):
     car = car_factory()
     db.session.add(car)
     db.session.commit()
+
+    # setting not existing column name in extension setup
+    app.extensions["crud"].key_attr = "extid"
 
     # trying to get not existing column
     with pytest.raises(AttributeError) as e, \

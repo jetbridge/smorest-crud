@@ -10,7 +10,7 @@ log = logging.getLogger(__name__)
 # access initialized extension
 _crud = LocalProxy(lambda: current_app.extensions["crud"])
 
-config_keys = dict(get_user="CRUD_GET_USER")
+config_keys = dict(get_user="CRUD_GET_USER", key_attr="CRUD_KEY_COLUMN")
 
 
 class CRUD(object):
@@ -29,12 +29,14 @@ class CRUD(object):
             CRUD_GET_USER=get_current_user,
             CRUD_ACCESS_CHECKS_ENABLED=True,
             SECRET_KEY="wnt2die",
+            CRUD_KEY_COLUMN="extid",
         )
     """
 
     db: SQLAlchemy
     app: Flask
     get_user: Optional[Callable]
+    key_attr: str = "id"
     access_control_enabled: bool
 
     def __init__(self, app=None):
@@ -55,6 +57,10 @@ class CRUD(object):
                 self.get_user = app.config["CRUD_GET_USER"]
             else:
                 raise Exception("CRUD_GET_USER not found in configuration")
+
+        # checking if CRUD_KEY_COLUMN is present in configs to replace default value
+        if config_keys["key_attr"] in app.config:
+            self.key_attr = app.config[config_keys["key_attr"]]
 
         # save sqla db object for later
         self.db = app.extensions["sqlalchemy"].db

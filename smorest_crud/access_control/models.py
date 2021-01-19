@@ -1,4 +1,5 @@
 from typing import Optional, TypeVar, Type, Generic, Union
+from smorest_crud import _crud
 
 from flask_sqlalchemy import BaseQuery, Model
 from flask import abort
@@ -44,17 +45,18 @@ class AccessControlUser(Generic[T]):
         return cls.query.query_for_user(user)
 
     @classmethod
-    def get_for_user_or_404(cls: Type[Model], user: Type[T], id_value: Union[str, int], key_attr: str = "extid") -> T:
+    def get_for_user_or_404(cls: Type[Model], user: Type[T], id_value: Union[str, int]) -> T:
         """
         Get instance by key if user allowed to read.
         :param user: user instance to check access for
         :param id_value: value of the key attribute for filtering
-        :param key_attr: name of the key attribute for filtering, extid be default
         """
-        if not hasattr(cls, key_attr):
-            raise AttributeError(f"class {cls.__name__} doesn't have attribute {key_attr}")
+        if not hasattr(cls, _crud.key_attr):
+            raise AttributeError(
+                f"class {cls.__name__} doesn't have attribute {_crud.key_attr}. Try to set CRUD_KEY_COLUMN in configs."
+            )
 
-        obj = cls.query.query_for_user(user).filter(getattr(cls, key_attr) == id_value).one_or_none()
+        obj = cls.query.query_for_user(user).filter(getattr(cls, _crud.key_attr) == id_value).one_or_none()
         if obj is None:
             abort(404)
         return obj
