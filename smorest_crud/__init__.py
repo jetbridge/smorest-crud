@@ -58,7 +58,7 @@ class CRUD(object):
             else:
                 raise Exception("CRUD_GET_USER not found in configuration")
 
-        # checking if CRUD_KEY_COLUMN is present in configs to replace default value
+        # checking if CRUD_KEY_COLUMN is present in configs to replace the default value
         if config_keys["key_attr"] in app.config:
             self.key_attr = app.config[config_keys["key_attr"]]
 
