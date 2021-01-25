@@ -7,7 +7,9 @@ from smorest_crud.access_control.models import AccessControlUser, AccessControlQ
 T = TypeVar("T", bound=AccessControlUser)
 
 
-def get_for_current_user_or_404(model: Type[T], id_value: Union[str, int]) -> Optional[T]:
+def get_for_current_user_or_404(
+    model: Type[T], id_value: Union[str, int]
+) -> Optional[T]:
     """
     Get an object by unique column and check if the current user can read it.
     :param model: date base model of the instance

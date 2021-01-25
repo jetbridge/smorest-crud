@@ -10,7 +10,7 @@ log = logging.getLogger(__name__)
 # access initialized extension
 _crud = LocalProxy(lambda: current_app.extensions["crud"])
 
-config_keys = dict(get_user="CRUD_GET_USER", key_attr="CRUD_KEY_COLUMN")
+config_keys = dict(get_user="CRUD_GET_USER", key_attr="CRUD_DEFAULT_KEY_COLUMN")
 
 
 class CRUD(object):
@@ -29,7 +29,7 @@ class CRUD(object):
             CRUD_GET_USER=get_current_user,
             CRUD_ACCESS_CHECKS_ENABLED=True,
             SECRET_KEY="wnt2die",
-            CRUD_KEY_COLUMN="extid",
+            CRUD_DEFAULT_KEY_COLUMN="extid",
         )
     """
 
@@ -58,7 +58,7 @@ class CRUD(object):
             else:
                 raise Exception("CRUD_GET_USER not found in configuration")
 
-        # checking if CRUD_KEY_COLUMN is present in configs to replace the default value
+        # checking if CRUD_DEFAULT_KEY_COLUMN is present in configs to replace the default value
         if config_keys["key_attr"] in app.config:
             self.key_attr = app.config[config_keys["key_attr"]]
 
@@ -76,7 +76,7 @@ from smorest_crud.access_control import (
     AccessControlUser,
     AccessControlQuery,
     get_for_current_user_or_404,
-    query_for_current_user
+    query_for_current_user,
 )
 
 __all__ = (
@@ -86,5 +86,5 @@ __all__ = (
     "AccessControlUser",
     "AccessControlQuery",
     "get_for_current_user_or_404",
-    "query_for_current_user"
+    "query_for_current_user",
 )

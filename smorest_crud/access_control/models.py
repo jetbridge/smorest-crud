@@ -35,6 +35,7 @@ class AccessControlUser(Generic[T]):
             def user_can_write(self, user) -> bool:
                 return user.is_admin  # only administrators can edit pets
     """
+
     query_class: Type[AccessControlQuery]
 
     @classmethod
@@ -45,7 +46,9 @@ class AccessControlUser(Generic[T]):
         return cls.query.query_for_user(user)
 
     @classmethod
-    def get_for_user_or_404(cls: Type[Model], user: Type[T], id_value: Union[str, int]) -> T:
+    def get_for_user_or_404(
+        cls: Type[Model], user: Type[T], id_value: Union[str, int]
+    ) -> T:
         """
         Get instance by key if user allowed to read.
         :param user: user instance to check access for
@@ -53,10 +56,14 @@ class AccessControlUser(Generic[T]):
         """
         if not hasattr(cls, _crud.key_attr):
             raise AttributeError(
-                f"class {cls.__name__} doesn't have attribute {_crud.key_attr}. Try to set CRUD_KEY_COLUMN in configs."
+                f"class {cls.__name__} doesn't have attribute {_crud.key_attr}. Try to set CRUD_DEFAULT_KEY_COLUMN in configs."
             )
 
-        obj = cls.query.query_for_user(user).filter(getattr(cls, _crud.key_attr) == id_value).one_or_none()
+        obj = (
+            cls.query.query_for_user(user)
+            .filter(getattr(cls, _crud.key_attr) == id_value)
+            .one_or_none()
+        )
         if obj is None:
             abort(404)
         return obj
