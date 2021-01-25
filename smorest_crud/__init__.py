@@ -1,7 +1,7 @@
 from flask import current_app
 from werkzeug.local import LocalProxy
 import logging
-from flask_sqlalchemy import SQLAlchemy, BaseQuery
+from flask_sqlalchemy import SQLAlchemy
 from flask import Flask
 from typing import Optional, Callable
 
@@ -10,47 +10,7 @@ log = logging.getLogger(__name__)
 # access initialized extension
 _crud = LocalProxy(lambda: current_app.extensions["crud"])
 
-
-class AccessControlUser:
-    """A model mixin to implement access checks for a given model/user.
-
-    Required on all models for views with access checks enabled.
-
-    Example::
-
-        class Pet(Model, AccessControlUser):
-            @classmethod
-            def query_for_user(cls, user) -> Optional[BaseQuery]:
-                return cls.query.filter_by(owner=user)
-
-            def user_can_read(self, user) -> bool:
-                return self.user_can_write(user) or self.owner.id == user.id
-
-            def user_can_write(self, user) -> bool:
-                return user.is_admin  # only administrators can edit pets
-    """
-
-    @classmethod
-    def query_for_user(cls, user: "AccessControlUser") -> Optional[BaseQuery]:
-        """Filter list of items for `user`, or None if disallowed."""
-        return None
-
-    def user_can_read(self, user: "AccessControlUser") -> bool:
-        """Check if `user` is allowed to access this object at all.
-
-        Defaults to calling `self.user_can_write(user)`.
-        """
-        return self.user_can_write(user)
-
-    def user_can_write(self, user: "AccessControlUser") -> bool:
-        """Check if `user` can make any modifications to this object (update, delete)."""
-        raise NotImplementedError(
-            f"user_can_write(self, user) not implemented on {self}"
-        )
-
-    def user_can_create(self, user: "AccessControlUser", args: Optional[dict]) -> bool:
-        """Check if `user` is allowed to create."""
-        return True
+config_keys = dict(get_user="CRUD_GET_USER", key_attr="CRUD_DEFAULT_KEY_COLUMN")
 
 
 class CRUD(object):
@@ -69,12 +29,14 @@ class CRUD(object):
             CRUD_GET_USER=get_current_user,
             CRUD_ACCESS_CHECKS_ENABLED=True,
             SECRET_KEY="wnt2die",
+            CRUD_DEFAULT_KEY_COLUMN="extid",
         )
     """
 
     db: SQLAlchemy
     app: Flask
     get_user: Optional[Callable]
+    key_attr: str = "id"
     access_control_enabled: bool
 
     def __init__(self, app=None):
@@ -96,6 +58,10 @@ class CRUD(object):
             else:
                 raise Exception("CRUD_GET_USER not found in configuration")
 
+        # checking if CRUD_DEFAULT_KEY_COLUMN is present in configs to replace the default value
+        if config_keys["key_attr"] in app.config:
+            self.key_attr = app.config[config_keys["key_attr"]]
+
         # save sqla db object for later
         self.db = app.extensions["sqlalchemy"].db
         # save stuff for later
@@ -106,5 +72,19 @@ class CRUD(object):
 
 
 from smorest_crud.view import ResourceView, CollectionView
+from smorest_crud.access_control import (
+    AccessControlUser,
+    AccessControlQuery,
+    get_for_current_user_or_404,
+    query_for_current_user,
+)
 
-__all__ = ("ResourceView", "CollectionView", "CRUD", "AccessControlUser")
+__all__ = (
+    "ResourceView",
+    "CollectionView",
+    "CRUD",
+    "AccessControlUser",
+    "AccessControlQuery",
+    "get_for_current_user_or_404",
+    "query_for_current_user",
+)
