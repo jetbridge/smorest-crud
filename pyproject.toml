@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "smorest_crud"
-version = "0.0.0"
+version = "0.0.7"
 description = "CRUD for Flask, SQLAlchemy, JWT, Smorest"
 authors = ["Mischa Spiegelmock <mischa@jetbridge.com>"]
 
